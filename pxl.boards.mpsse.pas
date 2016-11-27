@@ -36,14 +36,7 @@ type
     { High (1) or full voltage. }
     High);
 
-  TPinModeEx = (Input = GPIO_FUNCTION_IN,
-                Output = GPIO_FUNCTION_OUT,
-                Alt0 = GPIO_FUNCTION_ALT0,
-                Alt1 = GPIO_FUNCTION_ALT1,
-                Alt2 = GPIO_FUNCTION_ALT2,
-                Alt3 = GPIO_FUNCTION_ALT3,
-                Alt4 = GPIO_FUNCTION_ALT4,
-                Alt5 = GPIO_FUNCTION_ALT5);
+  TPinModeEx = Pin_CmdOps;
 
   TFTDISystemCore = class(TCustomSystemCore)
   strict private
@@ -67,30 +60,30 @@ type
   TMpsseGPIO = class(TCustomGPIO)
   strict private
     FSystemCore: TFTDISystemCore;
-    FGPIO: PGPIODevice;
+    //FGPIO: PGPIODevice;
 
     function GetPinModeEx(const Pin: Integer): TPinModeEx;
     procedure SetPinModeEx(const Pin: Integer; const Value: TPinModeEx);
     function Sync_To_MPSSE : boolean;
     function Init_Controller(DName : String) : boolean;
   protected
-    function GetPinMode(const Pin: Integer): TPinMode; override;
-    procedure SetPinMode(const Pin: Integer; const Mode: TPinMode); override;
+    function GetPinMode(const Pin: Integer): TPinMode;
+    procedure SetPinMode(const Pin: Integer; const Mode: TPinMode);
 
-    function GetPinValue(const Pin: Integer): TPinValue; override;
-    procedure SetPinValue(const Pin: Integer; const Value: TPinValue); override;
+    function GetPinValue(const Pin: Integer): TPinValue;
+    procedure SetPinValue(const Pin: Integer; const Value: TPinValue);
   public
-    constructor Create(const ASystemCore: TUltiboSystemCore; AGPIO: PGPIODevice = nil);
+    constructor Create(const ASystemCore: TFTDISystemCore);
     destructor Destroy; override;
 
     { Quickly changes specified pin value (assuming it is set for output).}
     procedure SetFastValue(const Pin: Integer; const Value: TPinValue);
 
     { Reference to @link(TUltiboSystemCore), which provides timing and delay utilities. }
-    property SystemCore: TUltiboSystemCore read FSystemCore;
+    property SystemCore: TFTDISystemCore read FSystemCore;
 
     { Determine what GPIO device this instance is connected to. }
-    property GPIO: PGPIODevice read FGPIO;
+    //property GPIO: PGPIODevice read FGPIO;
 
     { Provides control and feedback of currently selected mode for the given pin, including alternative functions. }
     property PinModeEx[const Pin: Integer]: TPinModeEx read GetPinModeEx write SetPinModeEx;
@@ -152,12 +145,14 @@ implementation
 constructor TFTDISystemCore.Create;
 begin
   inherited;
-
-  FBaseClock := $00000h;
+  //call FT_ListDevices
+  //call
+  //call FT_OpenEX
+  FBaseClock := $00000;
   FPageSize := MemoryGetPageSize;
 end;
 
-constructor TMpsseGPIO.Create(const ASystemCore: TFTDISystemCore; AGPIO: PGPIODevice);
+constructor TMpsseGPIO.Create(const ASystemCore: TFTDISystemCore);
 begin
   inherited Create;
 
@@ -165,9 +160,6 @@ begin
   if FSystemCore = nil then
     raise ESystemCoreRefRequired.Create(SSystemCoreRefNotProvided);
 
-  FGPIO := AGPIO;
-  if FGPIO = nil then
-    FGPIO := GPIODeviceGetDefault;
 
 end;
 
