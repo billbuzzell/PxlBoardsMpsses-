@@ -19,7 +19,7 @@ unit pxl.boards.mpsse;
 interface
 
 uses
-    SysUtils, GlobalConst, GlobalConfig, Platform, myDSSPI, GPIO, UART, I2C, SPI, PXL.TypeDef, PXL.Boards.Types;
+    SysUtils, D2xxUnit, FTDI_Constants, PXL.TypeDef, PXL.Boards.Types;
 
 type
     { I/O mode typically used in GPIO pins. }
